@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Garment Motif Composition Studio - GNU Octave</title>
+  <meta name="description" content="Place extracted saree motifs onto destination garments with interactive positioning, scaling, rotation, flip, and Porter-Duff alpha compositing in GNU Octave.">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header>
+    <nav class="navbar">
+      <a href="../index.html" class="nav-brand">
+        <div class="brand-icon">
+          <i class="fa-solid fa-gem"></i>
+        </div>
+        <div>
+          <div class="brand-title">Saree Motif Segmentation</div>
+          <div class="brand-subtitle">GNU Octave Image Processing Engine</div>
+        </div>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="../index.html" class="nav-link"><i class="fa-solid fa-sliders"></i> Basic Algorithms</a></li>
+        <li><a href="segmentation.html" class="nav-link"><i class="fa-solid fa-crop-simple"></i> Motif Segmentation</a></li>
+        <li><a href="composition.html" class="nav-link active"><i class="fa-solid fa-shirt"></i> Garment Composition</a></li>
+      </ul>
+
+      <div class="engine-status-badge" id="engineHealthBadge">
+        <span class="status-dot"></span> Checking Octave...
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-content">
+
+    <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="font-size: 1.8rem; margin-bottom: 0.25rem;">Garment Motif Composition Studio</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+          Place, resize, rotate, and blend your extracted saree motif onto a kurti, blouse, or lehenga fabric using GNU Octave alpha compositing.
+        </p>
+      </div>
+
+      <div>
+        <button id="downloadCompositeBtn" class="btn btn-secondary btn-sm" disabled>
+          <i class="fa-solid fa-download"></i> Save & Download Final Image
+        </button>
+      </div>
+    </div>
+
+    <!-- Studio Grid -->
+    <div class="studio-grid">
+
+      <!-- Left Column: Controls -->
+      <div class="card" style="max-height: 840px; overflow-y: auto;">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fa-solid fa-sliders"></i> Composition Controls</h2>
+          <span class="card-subtitle">Porter-Duff Blend</span>
+        </div>
+
+        <!-- Destination Garment Picker -->
+        <div class="form-group">
+          <label class="form-label">Destination Garment Fabric:</label>
+          <div class="sample-bar" id="destSampleChips"></div>
+          <button class="btn btn-outline btn-sm btn-block" onclick="document.getElementById('destFileInput').click()">
+            <i class="fa-solid fa-upload"></i> Upload Custom Garment
+          </button>
+          <input type="file" id="destFileInput" accept="image/*" style="display:none">
+        </div>
+
+        <!-- Selected Motif Viewer -->
+        <div class="form-group" style="background: rgba(18, 23, 34, 0.6); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span style="font-size: 0.85rem; font-weight: 600; color: #ffffff;">Active Transparent Motif:</span>
+            <button class="btn btn-outline btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="document.getElementById('motifFileInput').click()">
+              Upload PNG
+            </button>
+            <input type="file" id="motifFileInput" accept="image/png" style="display:none">
+          </div>
+          
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div class="checkerboard-bg" style="width: 50px; height: 50px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; overflow: hidden;">
+              <img id="compMotifThumb" src="" style="max-width: 100%; max-height: 100%; display: none;" alt="Motif">
+              <span id="compMotifEmpty" style="font-size: 0.7rem; color: var(--text-dim);">None</span>
+            </div>
+            <div>
+              <div id="compMotifName" style="font-size: 0.85rem; font-weight: 500; color: var(--secondary-light);">Extract a motif first</div>
+              <div style="font-size: 0.75rem; color: var(--text-dim);">Genuine 32-bit RGBA Alpha</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Position X & Y -->
+        <div class="form-group">
+          <label class="form-label">Position X (Horizontal): <span class="form-val-badge" id="badge_posX">120 px</span></label>
+          <input type="range" class="form-range" id="comp_posX" min="0" max="600" value="120">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Position Y (Vertical): <span class="form-val-badge" id="badge_posY">150 px</span></label>
+          <input type="range" class="form-range" id="comp_posY" min="0" max="600" value="150">
+        </div>
+
+        <!-- Scale & Size -->
+        <div class="form-group">
+          <label class="form-label">Motif Scale / Size: <span class="form-val-badge" id="badge_scale">0.85x</span></label>
+          <input type="range" class="form-range" id="comp_scale" min="0.1" max="2.5" step="0.05" value="0.85">
+        </div>
+
+        <!-- Rotation Angle -->
+        <div class="form-group">
+          <label class="form-label">Rotation Angle: <span class="form-val-badge" id="badge_angle">15°</span></label>
+          <input type="range" class="form-range" id="comp_angle" min="-180" max="180" step="5" value="15">
+        </div>
+
+        <!-- Opacity Slider -->
+        <div class="form-group">
+          <label class="form-label">Blending Opacity: <span class="form-val-badge" id="badge_opacity">95%</span></label>
+          <input type="range" class="form-range" id="comp_opacity" min="0.1" max="1.0" step="0.05" value="0.95">
+        </div>
+
+        <!-- Flip Controls -->
+        <div class="form-group" style="display: flex; gap: 1.5rem;">
+          <label class="form-checkbox-label">
+            <input type="checkbox" class="form-checkbox" id="comp_flipH">
+            <span>Flip Horizontal</span>
+          </label>
+          <label class="form-checkbox-label">
+            <input type="checkbox" class="form-checkbox" id="comp_flipV">
+            <span>Flip Vertical</span>
+          </label>
+        </div>
+
+        <!-- Render Button -->
+        <div style="margin-top: 1.5rem;">
+          <button id="renderCompositeBtn" class="btn btn-primary btn-block">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Render Composite in Octave
+          </button>
+        </div>
+
+        <div style="margin-top: 0.75rem; text-align: center; font-size: 0.75rem; color: var(--text-dim);">
+          <i class="fa-solid fa-mouse-pointer"></i> Tip: You can click anywhere on the garment image to position the motif!
+        </div>
+
+      </div>
+
+      <!-- Right Column: Previews -->
+      <div class="comparison-grid">
+
+        <!-- Destination Garment with Click-to-Position -->
+        <div class="view-panel">
+          <div class="view-label">
+            <span><i class="fa-solid fa-shirt"></i> Target Garment (Click to Position)</span>
+            <span style="font-size:0.75rem;color:var(--text-dim)">Click anywhere</span>
+          </div>
+          <div class="preview-container">
+            <img id="destPreviewImg" class="preview-img" style="display:none;" alt="Destination Garment">
+            <div id="destEmptyState" class="preview-empty-state">
+              <i class="fa-solid fa-shirt"></i>
+              <p>Select a destination garment</p>
+            </div>
+            <div class="stats-badge-overlay" id="destStatsBadge" style="display:none"></div>
+          </div>
+        </div>
+
+        <!-- Final Composite Output -->
+        <div class="view-panel">
+          <div class="view-label">
+            <span><i class="fa-solid fa-image"></i> Final Combined Garment Image</span>
+            <span style="font-size:0.75rem;color:var(--secondary-light)">Octave Alpha Composite</span>
+          </div>
+          <div class="preview-container">
+            <img id="compositePreviewImg" class="preview-img" style="display:none;" alt="Final Combined Image">
+            <div id="compositeEmptyState" class="preview-empty-state">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <p>Rendered composite garment will appear here</p>
+            </div>
+            <div class="stats-badge-overlay" id="compositeStatsBadge" style="display:none"></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>
+      Saree Motif Segmentation Using Image Processing &bull; Academic Project Implementation &bull;
+      Powered by <strong>GNU Octave</strong> & <strong>Node.js Express</strong>
+    </p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="../js/app.js"></script>
+  <script src="../js/composition.js"></script>
+</body>
+</html>

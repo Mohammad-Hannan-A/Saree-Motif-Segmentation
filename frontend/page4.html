@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page 4: Motif Extraction & Application | Saree Motif Segmentation</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .canvas-crop-container {
+      position: relative;
+      display: inline-block;
+      max-width: 100%;
+      cursor: crosshair;
+      user-select: none;
+    }
+    .canvas-crop-container img {
+      max-width: 100%;
+      max-height: 400px;
+      display: block;
+      border-radius: var(--radius-sm);
+    }
+    .crop-box-rect {
+      position: absolute;
+      border: 2px dashed #0d9488;
+      background: rgba(13, 148, 136, 0.25);
+      pointer-events: none;
+      display: none;
+    }
+    .tab-bar {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.25rem;
+    }
+    .tab-btn {
+      padding: 0.65rem 1.25rem;
+      font-weight: 700;
+      font-size: 0.85rem;
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s ease;
+    }
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <!-- Global App Header with 4-Step Progress Navigation -->
+  <header id="app-header"></header>
+
+  <main class="container">
+    <div class="page-intro">
+      <div>
+        <span class="badge-academic">Step 4 of 4 • Synthesis & Application</span>
+        <h2 class="page-title">Motif Extraction & Placement on Destination Images</h2>
+        <p class="page-subtitle">
+          Extract decorative patterns using Bounding Box cropping, Color thresholding, or Morphological Mask refinement.
+          Export transparent 32-bit PNGs and composite motifs onto garments or everyday objects using GNU Octave.
+        </p>
+      </div>
+      <div style="display: flex; gap: 0.75rem;">
+        <button class="btn btn-outline" id="btn-back-page3">
+          &larr; Back to Page 3
+        </button>
+      </div>
+    </div>
+
+    <!-- Educational Explanation Box -->
+    <div class="edu-box">
+      <div class="edu-box-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        Extraction Modes & Alpha Transparency Compositing
+      </div>
+      <p class="edu-box-text">
+        <strong>Bounding Box Mode:</strong> Crops strictly the selected rectangular Region of Interest (ROI) without resizing the full image.
+        <strong>Mask-Based Extraction:</strong> Employs color thresholding and morphological hole-filling to generate an 8-bit Alpha matte, saving a genuine 32-bit transparent PNG.
+        <strong>Compositing:</strong> GNU Octave applies Porter-Duff 'Over' alpha blending to seamlessly composite the motif onto another garment without modifying the original destination photo.
+      </p>
+    </div>
+
+    <!-- Mode Selector Tabs: Part 1 (Extraction) vs Part 2 (Compositing) -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-extract" onclick="switchMainTab('extract')">
+        Section A & B: Motif Extraction (Bounding Box & Mask)
+      </button>
+      <button class="tab-btn" id="tab-compose" onclick="switchMainTab('compose')">
+        Section C: Place Motif on Destination Garment / Object
+      </button>
+    </div>
+
+    <!-- ================= SECTION 1: EXTRACTION WORKFLOW ================= -->
+    <div id="section-extract">
+      <!-- Input Source Selector -->
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-body" style="padding: 1rem 1.35rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 0.85rem; flex: 1; min-width: 320px;">
+            <label class="form-label" style="margin: 0; white-space: nowrap; font-weight: 700;">
+              Source Motif Image:
+            </label>
+            <select class="form-select" id="motif-source-select"></select>
+          </div>
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <span class="text-muted" style="font-size: 0.78rem;">Or upload a new image:</span>
+            <input type="file" id="extra-source-upload" accept="image/png, image/jpeg" style="display:none;">
+            <button class="btn btn-outline-sm" onclick="document.getElementById('extra-source-upload').click()">
+              Upload Custom Image
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-workflow">
+        <!-- Extraction Controls -->
+        <div class="controls-col">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Extraction Mode</div>
+                <div class="card-subtitle">Select isolation strategy</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">Method:</label>
+                <select class="form-select" id="extract-method-select">
+                  <option value="bbox">1. Manual Bounding Box Crop (Exact Region Only)</option>
+                  <option value="color">2. Color-Based Extraction (Gold Zari & Transparent PNG)</option>
+                  <option value="threshold">3. Otsu Threshold & Morphological Mask</option>
+                  <option value="edge">4. Edge-Assisted Boundary Extraction</option>
+                </select>
+              </div>
+
+              <!-- Bounding Box Parameter Coordinates -->
+              <div id="panel-bbox-controls">
+                <div style="background:#f0fdfa; border:1px solid #ccfbf1; padding:0.75rem; border-radius:var(--radius-sm); margin-bottom:1rem;">
+                  <span style="font-size:0.8rem; color:#0f766e; font-weight:600;">
+                    Drag a rectangular box over the motif image on the right, or enter pixel coordinates:
+                  </span>
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-top:0.5rem;">
+                    <div>
+                      <label class="form-label" style="font-size:0.72rem;">X Start (px)</label>
+                      <input type="number" class="form-input" id="box-x" value="20" style="padding:0.3rem;">
+                    </div>
+                    <div>
+                      <label class="form-label" style="font-size:0.72rem;">Y Start (px)</label>
+                      <input type="number" class="form-input" id="box-y" value="20" style="padding:0.3rem;">
+                    </div>
+                    <div>
+                      <label class="form-label" style="font-size:0.72rem;">Width (px)</label>
+                      <input type="number" class="form-input" id="box-w" value="150" style="padding:0.3rem;">
+                    </div>
+                    <div>
+                      <label class="form-label" style="font-size:0.72rem;">Height (px)</label>
+                      <input type="number" class="form-input" id="box-h" value="150" style="padding:0.3rem;">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Mask Refinement Options -->
+              <div id="panel-mask-options" style="display: none;">
+                <div class="form-group">
+                  <label class="form-label">Target Motif Color:</label>
+                  <select class="form-select" id="extract-color-preset">
+                    <option value="gold" selected>Traditional Gold Zari [218, 165, 32]</option>
+                    <option value="ruby">Ruby Maroon [155, 17, 30]</option>
+                    <option value="emerald">Emerald Green [9, 121, 105]</option>
+                    <option value="sapphire">Peacock Sapphire Blue [20, 24, 82]</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Color Tolerance Radius: <span id="disp-color-tol">60</span></label>
+                  <input type="range" class="form-input" id="extract-color-tol" min="20" max="140" value="60" style="padding:0;">
+                </div>
+                <div style="background:#f8fafc; border:1px solid var(--border); padding:0.75rem; border-radius:var(--radius-sm); margin-bottom:1rem;">
+                  <span class="form-label" style="margin-bottom:0.4rem;">Morphological Post-Processing:</span>
+                  <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.78rem; margin-bottom:0.3rem; cursor:pointer;">
+                    <input type="checkbox" id="mask-fill-holes" checked> Fill internal thread holes (imfill)
+                  </label>
+                  <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.78rem; cursor:pointer;">
+                    <input type="checkbox" id="mask-clean-noise" checked> Remove isolated background yarn noise
+                  </label>
+                </div>
+              </div>
+
+              <button class="btn btn-primary" id="btn-run-extraction" style="width: 100%;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                Extract Motif in GNU Octave (.m)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Selection & Result Previews -->
+        <div class="previews-col">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Interactive Source & Extracted Outputs</div>
+                <div class="card-subtitle" id="extract-meta-text">Drag box on source image below to crop</div>
+              </div>
+              <div style="display:flex; gap:0.5rem;">
+                <button class="btn btn-outline-sm" id="btn-use-for-composite" disabled>
+                  Use for Compositing &rarr;
+                </button>
+                <button class="btn btn-primary btn-outline-sm" id="btn-download-motif" disabled>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Download Motif
+                </button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="preview-grid-2">
+                <!-- Source Interactive Canvas Wrap -->
+                <div class="preview-pane">
+                  <div class="preview-pane-header">
+                    <span class="preview-pane-title">Interactive Source Image</span>
+                    <span class="text-muted" style="font-size:0.72rem;">Drag box to crop</span>
+                  </div>
+                  <div class="preview-canvas-wrap" style="padding:0;">
+                    <div class="canvas-crop-container" id="crop-container">
+                      <img id="extract-source-img" alt="Source Motif">
+                      <div class="crop-box-rect" id="crop-box-rect"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Final Extracted Motif Output (Cropped Box or Transparent PNG) -->
+                <div class="preview-pane">
+                  <div class="preview-pane-header">
+                    <span class="preview-pane-title" id="extracted-pane-title">
+                      Extracted Motif Output
+                    </span>
+                    <span class="badge-academic" id="motif-type-badge">Crop Only</span>
+                  </div>
+                  <div class="preview-canvas-wrap">
+                    <div class="preview-empty" id="motif-empty">
+                      <span>Extracted motif or cropped region will appear here</span>
+                    </div>
+                    <img id="motif-result-img" style="display: none;" alt="Extracted Motif">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= SECTION 2: COMPOSITING WORKFLOW ================= -->
+    <div id="section-compose" style="display: none;">
+      <div class="grid-workflow">
+        <!-- Destination Selection & Transform Controls -->
+        <div class="controls-col">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Placement & Transformation Controls</div>
+                <div class="card-subtitle">Tune coordinates, scale, and rotation</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <!-- Destination Selection -->
+              <div class="form-group">
+                <label class="form-label">Destination Image (Garment/Object):</label>
+                <select class="form-select" id="dest-image-select">
+                  <option value="kurti">Sample: Mustard Kurti Fabric</option>
+                  <option value="blouse">Sample: Ivory Silk Blouse</option>
+                </select>
+              </div>
+
+              <!-- Upload Custom Destination -->
+              <div class="form-group">
+                <input type="file" id="dest-upload-input" accept="image/png, image/jpeg" style="display:none;">
+                <button class="btn btn-outline-sm" style="width:100%;" onclick="document.getElementById('dest-upload-input').click()">
+                  Upload Other Clothing / Animal / Object Image
+                </button>
+              </div>
+
+              <div style="border-top:1px solid var(--border); padding-top:1rem; margin-top:1rem;">
+                <div class="form-group">
+                  <label class="form-label">Horizontal Position X (px): <span id="disp-pos-x">60</span></label>
+                  <input type="range" class="form-input" id="compose-x" min="0" max="600" value="60" style="padding:0;">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Vertical Position Y (px): <span id="disp-pos-y">60</span></label>
+                  <input type="range" class="form-input" id="compose-y" min="0" max="600" value="60" style="padding:0;">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Scale Factor: <span id="disp-scale">1.0</span>×</label>
+                  <input type="range" class="form-input" id="compose-scale" min="0.2" max="2.5" step="0.1" value="1.0" style="padding:0;">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Rotation Angle: <span id="disp-angle">0</span>°</label>
+                  <input type="range" class="form-input" id="compose-angle" min="-180" max="180" step="5" value="0" style="padding:0;">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Opacity: <span id="disp-opacity">1.0</span></label>
+                  <input type="range" class="form-input" id="compose-opacity" min="0.1" max="1.0" step="0.05" value="1.0" style="padding:0;">
+                </div>
+
+                <button class="btn btn-primary" id="btn-run-compose" style="width: 100%;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                  </svg>
+                  Composite in GNU Octave (.m)
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Composited Output Preview Pane -->
+        <div class="previews-col">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Composited Garment / Destination Image</div>
+                <div class="card-subtitle" id="compose-status-text">Porter-Duff 'Over' alpha blend generated by Octave</div>
+              </div>
+              <button class="btn btn-primary btn-outline-sm" id="btn-download-composite" disabled>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Download Composited Image
+              </button>
+            </div>
+            <div class="card-body">
+              <div class="preview-canvas-wrap" style="min-height: 420px;">
+                <div class="preview-empty" id="compose-empty">
+                  <span>Composited garment output will appear here</span>
+                </div>
+                <img id="compose-result-img" style="display: none;" alt="Composited Output">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loading-modal">
+      <div class="spinner"></div>
+      <div class="loading-title" id="loading-title">Executing GNU Octave...</div>
+      <div class="loading-desc" id="loading-desc">Calculating mask and cropping pixels</div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <p>Saree Motif Segmentation Using Image Processing &bull; GNU Octave Academic Engine &bull; Light Theme Edition</p>
+  </footer>
+
+  <script src="js/session.js"></script>
+  <script src="js/page4.js"></script>
+</body>
+</html>

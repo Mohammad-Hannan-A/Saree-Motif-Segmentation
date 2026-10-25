@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page 1: Image Upload & Grayscale Conversion | Saree Motif Segmentation</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Global App Header with 4-Step Progress Navigation -->
+  <header id="app-header"></header>
+
+  <main class="container">
+    <div class="page-intro">
+      <div>
+        <span class="badge-academic">Step 1 of 4 • Pre-Processing Foundation</span>
+        <h2 class="page-title">Image Upload & Grayscale Conversion</h2>
+        <p class="page-subtitle">
+          Upload an authentic saree textile image or select from academic test samples.
+          Convert the RGB color image to single-channel luminance grayscale using GNU Octave.
+        </p>
+      </div>
+      <div>
+        <button class="btn btn-primary" id="btn-save-continue" disabled>
+          Save & Continue to Page 2
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Beginner Explanation Alert Card -->
+    <div class="edu-box">
+      <div class="edu-box-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        Academic Principle: ITU-R BT.601 Weighted Luminance Grayscale Conversion
+      </div>
+      <p class="edu-box-text">
+        Color saree images contain three color bands: Red, Green, and Blue. Because human eyes are biologically most sensitive to green wavelengths and least sensitive to blue, a simple average (R+G+B)/3 creates unnatural contrast. GNU Octave computes the true perceptual grayscale intensity using:
+      </p>
+      <div class="edu-formula">Y = 0.2989 × R + 0.5870 × G + 0.1140 × B</div>
+    </div>
+
+    <div class="grid-workflow">
+      <!-- Left Column: Upload Controls & Academic Samples -->
+      <div class="controls-col">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Select Saree Image</div>
+              <div class="card-subtitle">Choose a local file or click a test sample</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <!-- Drag and Drop Upload Area -->
+            <div class="dropzone" id="dropzone">
+              <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <div class="dropzone-title">Click to upload or drag image here</div>
+              <div class="dropzone-hint">Supports PNG, JPG, JPEG (Max: 25MB)</div>
+              <input type="file" id="file-input" accept="image/png, image/jpeg, image/jpg">
+            </div>
+
+            <!-- Pre-Packaged Academic Test Samples -->
+            <div class="sample-shelf">
+              <div class="sample-shelf-title">Academic Test Samples</div>
+              <div class="sample-thumbnails" id="samples-container">
+                <div class="preview-empty" style="padding: 0.5rem; font-size: 0.75rem;">Loading samples...</div>
+              </div>
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+              <button class="btn btn-primary" id="btn-convert-grayscale" style="width: 100%;" disabled>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M12 2a10 10 0 0 1 0 20z"></path>
+                </svg>
+                Convert to Grayscale (GNU Octave)
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Visual Previews (Original vs Grayscale) -->
+      <div class="previews-col">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Side-by-Side Verification Previews</div>
+            <div class="card-subtitle">Real-time inspection of Octave output matrices</div>
+          </div>
+          <div class="card-body">
+            <div class="preview-grid-2">
+              <!-- Original Image Pane -->
+              <div class="preview-pane">
+                <div class="preview-pane-header">
+                  <span class="preview-pane-title">
+                    <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#0d9488;"></span>
+                    Original Saree (RGB)
+                  </span>
+                  <button class="btn btn-outline-sm" id="btn-download-original" disabled>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Download
+                  </button>
+                </div>
+                <div class="preview-canvas-wrap" id="orig-preview-wrap">
+                  <div class="preview-empty" id="orig-empty">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                    <span>No image uploaded yet</span>
+                  </div>
+                  <img id="orig-img" style="display: none;" alt="Original Saree Preview">
+                </div>
+              </div>
+
+              <!-- Grayscale Image Pane -->
+              <div class="preview-pane">
+                <div class="preview-pane-header">
+                  <span class="preview-pane-title">
+                    <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#64748b;"></span>
+                    Grayscale Output (Octave .m)
+                  </span>
+                  <button class="btn btn-outline-sm" id="btn-download-gray" disabled>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Download
+                  </button>
+                </div>
+                <div class="preview-canvas-wrap" id="gray-preview-wrap">
+                  <div class="preview-empty" id="gray-empty">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="2" x2="12" y2="22"></line>
+                    </svg>
+                    <span>Grayscale will appear here after Octave processing</span>
+                  </div>
+                  <img id="gray-img" style="display: none;" alt="Grayscale Octave Preview">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="text-muted" style="font-size: 0.82rem;" id="octave-timer-status">
+              Ready for processing.
+            </span>
+            <button class="btn btn-primary" id="btn-save-continue-bottom" disabled>
+              Save & Continue to Page 2 &rarr;
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loading-modal">
+      <div class="spinner"></div>
+      <div class="loading-title" id="loading-title">Processing in GNU Octave...</div>
+      <div class="loading-desc" id="loading-desc">Executing grayscale_conversion.m via child process</div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <p>Saree Motif Segmentation Using Image Processing &bull; GNU Octave Academic Engine &bull; Light Theme Edition</p>
+  </footer>
+
+  <script src="js/session.js"></script>
+  <script src="js/page1.js"></script>
+</body>
+</html>

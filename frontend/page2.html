@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page 2: Six Basic Image-Processing Algorithms | Saree Motif Segmentation</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Global App Header with 4-Step Progress Navigation -->
+  <header id="app-header"></header>
+
+  <main class="container">
+    <div class="page-intro">
+      <div>
+        <span class="badge-academic">Step 2 of 4 • Classical Transformations</span>
+        <h2 class="page-title">Six Basic Image-Processing Algorithms</h2>
+        <p class="page-subtitle">
+          Select any combination of the 6 fundamental image transformations. Run 1, 4, or all 6 in GNU Octave.
+          Each selected algorithm generates a separate, downloadable output.
+        </p>
+      </div>
+      <div style="display: flex; gap: 0.75rem;">
+        <button class="btn btn-outline" id="btn-back-page1">
+          &larr; Back to Page 1
+        </button>
+        <button class="btn btn-primary" id="btn-save-continue-p3" disabled>
+          Continue to Page 3 &rarr;
+        </button>
+      </div>
+    </div>
+
+    <!-- Educational Explanation Box -->
+    <div class="edu-box">
+      <div class="edu-box-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        Multi-Algorithm Processing Architecture in GNU Octave
+      </div>
+      <p class="edu-box-text">
+        Every selected algorithm is executed as an isolated mathematical operation inside GNU Octave. No outputs are restricted or discarded. If you select 1 algorithm, 1 output is produced; if all 6 are selected, all 6 outputs are generated with dedicated timing and individual download buttons.
+      </p>
+    </div>
+
+    <div class="grid-workflow">
+      <!-- Left Column: Source Image Selector & 6 Algorithms Checklist -->
+      <div class="controls-col">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Algorithm Configuration</div>
+              <div class="card-subtitle">Choose source image and check target algorithms</div>
+            </div>
+            <div style="display:flex; gap:0.4rem;">
+              <button class="btn btn-outline-sm" id="btn-select-all">Select All</button>
+              <button class="btn btn-outline-sm" id="btn-deselect-all">Clear</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <!-- Source Image Selection Radio -->
+            <div class="form-group" style="padding-bottom: 0.85rem; border-bottom: 1px solid var(--border);">
+              <label class="form-label">Operating Source Image:</label>
+              <div style="display: flex; gap: 1rem; margin-top: 0.4rem;">
+                <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
+                  <input type="radio" name="sourceChoice" value="original" checked>
+                  Original Color Saree (RGB)
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
+                  <input type="radio" name="sourceChoice" value="grayscale">
+                  Saved Grayscale Image
+                </label>
+              </div>
+            </div>
+
+            <!-- The Six Basic Algorithms List -->
+            <div class="algo-checklist" id="algo-checklist">
+              <!-- 1. Grayscale Conversion -->
+              <div class="algo-check-item selected" data-algo="grayscale_conversion">
+                <input type="checkbox" id="chk-grayscale" checked>
+                <div class="algo-info">
+                  <label for="chk-grayscale" class="algo-name">1. Grayscale Conversion</label>
+                  <div class="algo-desc">ITU-R BT.601 perceptual luminance conversion (0.2989R + 0.5870G + 0.1140B).</div>
+                </div>
+              </div>
+
+              <!-- 2. Image Negative -->
+              <div class="algo-check-item selected" data-algo="image_negative">
+                <input type="checkbox" id="chk-negative" checked>
+                <div class="algo-info">
+                  <label for="chk-negative" class="algo-name">2. Image Negative</label>
+                  <div class="algo-desc">Photographic inversion s = 255 - r. Enhances dark metallic embroidery lines.</div>
+                </div>
+              </div>
+
+              <!-- 3. Image Resizing -->
+              <div class="algo-check-item" data-algo="image_resizing">
+                <input type="checkbox" id="chk-resizing">
+                <div class="algo-info">
+                  <label for="chk-resizing" class="algo-name">3. Image Resizing</label>
+                  <div class="algo-desc">Spatial scaling via bilinear resampling with aspect ratio preservation.</div>
+                  <div class="algo-params-panel" id="params-resizing">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                      <div>
+                        <label class="form-label" style="font-size:0.75rem;">Target Width (px)</label>
+                        <input type="number" class="form-input" id="p-resize-w" value="300" min="50" max="2000" style="padding:0.35rem;">
+                      </div>
+                      <div>
+                        <label class="form-label" style="font-size:0.75rem;">Target Height (px)</label>
+                        <input type="number" class="form-input" id="p-resize-h" value="300" min="50" max="2000" style="padding:0.35rem;">
+                      </div>
+                    </div>
+                    <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.75rem; margin-top:0.4rem; cursor:pointer;">
+                      <input type="checkbox" id="p-resize-aspect" checked> Preserve geometric aspect ratio
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4. Image Thresholding -->
+              <div class="algo-check-item" data-algo="image_thresholding">
+                <input type="checkbox" id="chk-thresholding">
+                <div class="algo-info">
+                  <label for="chk-thresholding" class="algo-name">4. Image Thresholding</label>
+                  <div class="algo-desc">Converts intensity to binary mask using Otsu's optimal variance or manual cutoff.</div>
+                  <div class="algo-params-panel" id="params-thresholding">
+                    <label class="form-label" style="font-size:0.75rem;">Threshold Mode:</label>
+                    <select class="form-select" id="p-thresh-mode" style="padding:0.35rem; font-size:0.8rem;">
+                      <option value="-1">Automatic Otsu's Global Method</option>
+                      <option value="manual">Manual Threshold Value</option>
+                    </select>
+                    <div id="p-thresh-slider-box" style="display: none; margin-top: 0.5rem;">
+                      <label class="form-label" style="font-size:0.75rem;">Threshold Cutoff: <span id="thresh-val-display">128</span></label>
+                      <input type="range" id="p-thresh-val" min="0" max="255" value="128" style="width: 100%;">
+                    </div>
+                    <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.75rem; margin-top:0.4rem; cursor:pointer;">
+                      <input type="checkbox" id="p-thresh-invert"> Invert black/white output
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 5. Gaussian Filtering -->
+              <div class="algo-check-item" data-algo="gaussian_filtering">
+                <input type="checkbox" id="chk-gaussian">
+                <div class="algo-info">
+                  <label for="chk-gaussian" class="algo-name">5. Gaussian Filtering</label>
+                  <div class="algo-desc">Isotropic 2D Gaussian kernel convolution to smooth yarn weave texture.</div>
+                  <div class="algo-params-panel" id="params-gaussian">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                      <div>
+                        <label class="form-label" style="font-size:0.75rem;">Kernel Size (NxN)</label>
+                        <select class="form-select" id="p-gauss-ksize" style="padding:0.35rem; font-size:0.8rem;">
+                          <option value="3">3 × 3 (Light)</option>
+                          <option value="5" selected>5 × 5 (Standard)</option>
+                          <option value="7">7 × 7 (Heavy)</option>
+                          <option value="9">9 × 9 (Deep Blur)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label class="form-label" style="font-size:0.75rem;">Sigma (&sigma;)</label>
+                        <input type="number" class="form-input" id="p-gauss-sigma" value="1.5" step="0.5" min="0.5" max="5.0" style="padding:0.35rem;">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 6. RGB to HSV Color Conversion -->
+              <div class="algo-check-item" data-algo="rgb_to_hsv_conversion">
+                <input type="checkbox" id="chk-hsv">
+                <div class="algo-info">
+                  <label for="chk-hsv" class="algo-name">6. RGB to HSV Color Conversion</label>
+                  <div class="algo-desc">Decouples chromaticity from intensity into Hue, Saturation, and Value multi-panel preview.</div>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-primary" id="btn-apply-algos" style="width: 100%;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              Apply Selected Algorithms (GNU Octave)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Current Source Preview & Output Gallery -->
+      <div class="previews-col">
+        <!-- Active Source Preview Card -->
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Current Input Image</div>
+              <div class="card-subtitle" id="source-subtitle">Loaded from Page 1 Session</div>
+            </div>
+            <span class="badge-academic" id="source-badge">RGB Source</span>
+          </div>
+          <div class="card-body" style="padding: 1rem;">
+            <div class="preview-canvas-wrap" style="min-height: 200px; max-height: 260px;">
+              <img id="source-preview-img" alt="Source Image Preview">
+            </div>
+          </div>
+        </div>
+
+        <!-- Generated Outputs Gallery Card -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Generated Results Gallery</div>
+              <div class="card-subtitle" id="gallery-status">Select algorithms and click "Apply"</div>
+            </div>
+            <button class="btn btn-primary btn-outline-sm" id="btn-continue-gallery" disabled>
+              Save Results & Continue &rarr;
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="gallery-grid" id="results-gallery">
+              <div class="preview-empty" style="grid-column: 1 / -1; padding: 3rem;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <span>No results generated yet. Check 1 to 6 algorithms and click "Apply Selected Algorithms".</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loading-modal">
+      <div class="spinner"></div>
+      <div class="loading-title" id="loading-title">Executing GNU Octave Algorithms...</div>
+      <div class="loading-desc" id="loading-desc">Processing request 1 of 6...</div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <p>Saree Motif Segmentation Using Image Processing &bull; GNU Octave Academic Engine &bull; Light Theme Edition</p>
+  </footer>
+
+  <script src="js/session.js"></script>
+  <script src="js/page2.js"></script>
+</body>
+</html>

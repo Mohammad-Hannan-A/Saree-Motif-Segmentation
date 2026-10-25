@@ -1,0 +1,84 @@
+/* responsive.css - Responsive rules for tablets, mobiles, and large screens */
+
+@media (max-width: 1200px) {
+  .studio-grid-three {
+    grid-template-columns: 320px 1fr;
+  }
+  .studio-grid-three .view-panel:last-child {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 992px) {
+  .studio-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .studio-grid-three {
+    grid-template-columns: 1fr;
+  }
+
+  .studio-grid-three .view-panel:last-child {
+    grid-column: span 1;
+  }
+
+  .comparison-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .nav-links {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    overflow-x: auto;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .engine-status-badge {
+    order: 2;
+  }
+
+  .hero-banner {
+    padding: 2rem 1rem;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+  }
+
+  .hero-desc {
+    font-size: 0.95rem;
+  }
+
+  .card {
+    padding: 1.15rem;
+  }
+
+  .preview-container {
+    min-height: 320px;
+  }
+
+  .toast-container {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .toast {
+    min-width: auto;
+    width: 100%;
+  }
+}

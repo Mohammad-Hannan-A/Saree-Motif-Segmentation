@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page 3: Four Image-Processing Methods | Saree Motif Segmentation</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Global App Header with 4-Step Progress Navigation -->
+  <header id="app-header"></header>
+
+  <main class="container">
+    <div class="page-intro">
+      <div>
+        <span class="badge-academic">Step 3 of 4 • Advanced Methodology Suite</span>
+        <h2 class="page-title">Four Image-Processing Methods</h2>
+        <p class="page-subtitle">
+          Explore the 4 primary academic domains: Enhancement, Segmentation, Edge Detection, and Morphology.
+          Select any of the 12 GNU Octave sub-algorithms, customize parameters, inspect side-by-side results, and reuse outputs.
+        </p>
+      </div>
+      <div style="display: flex; gap: 0.75rem;">
+        <button class="btn btn-outline" id="btn-back-page2">
+          &larr; Back to Page 2
+        </button>
+        <button class="btn btn-primary" id="btn-continue-motif">
+          Continue to Motif Extraction &rarr;
+        </button>
+      </div>
+    </div>
+
+    <!-- Educational Guide Card -->
+    <div class="edu-box">
+      <div class="edu-box-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        Four Pillars of Saree Motif Analysis
+      </div>
+      <p class="edu-box-text">
+        <strong>1. Enhancement:</strong> Expands dynamic contrast and removes sensor/weave noise.
+        <strong>2. Segmentation:</strong> Clusters pixels by color/region to isolate decorative embroidery.
+        <strong>3. Edge Detection:</strong> Traces sharp zari boundaries and floral contours.
+        <strong>4. Morphology:</strong> Cleans up gaps, fills interior holes, and refines motif masks.
+      </p>
+    </div>
+
+    <!-- Source Image Selector Dropdown -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+      <div class="card-body" style="padding: 1rem 1.35rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 0.85rem; flex: 1; min-width: 300px;">
+          <label class="form-label" style="margin: 0; white-space: nowrap; font-weight: 700;">
+            Source Image for Operation:
+          </label>
+          <select class="form-select" id="source-image-select">
+            <option value="">Loading available images from session...</option>
+          </select>
+        </div>
+        <div class="text-muted" style="font-size: 0.78rem;" id="source-info-text">
+          Can select original, grayscale, or any Page 2/3 output as input.
+        </div>
+      </div>
+    </div>
+
+    <!-- Four Method Selection Cards -->
+    <div class="methods-grid">
+      <!-- Method 1 Card -->
+      <div class="method-card active" data-method="enhancement" id="card-m1">
+        <div class="method-header">
+          <div class="method-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </div>
+          <div>
+            <div class="method-name">Method 1: Enhancement</div>
+            <div class="method-desc">Contrast & Denoising</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Method 2 Card -->
+      <div class="method-card" data-method="segmentation" id="card-m2">
+        <div class="method-header">
+          <div class="method-icon" style="background:var(--secondary-light); color:var(--secondary-text);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="method-name">Method 2: Segmentation</div>
+            <div class="method-desc">K-Means, Region, Color</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Method 3 Card -->
+      <div class="method-card" data-method="edge" id="card-m3">
+        <div class="method-header">
+          <div class="method-icon" style="background:var(--lavender-light); color:var(--lavender-text);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+          </div>
+          <div>
+            <div class="method-name">Method 3: Edge Detection</div>
+            <div class="method-desc">Sobel, Prewitt, Canny</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Method 4 Card -->
+      <div class="method-card" data-method="morphology" id="card-m4">
+        <div class="method-header">
+          <div class="method-icon" style="background:var(--peach-light); color:var(--peach-text);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+            </svg>
+          </div>
+          <div>
+            <div class="method-name">Method 4: Morphology</div>
+            <div class="method-desc">Dilation, Erosion, Open/Close</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Method Interactive Workspace -->
+    <div class="grid-workflow">
+      <!-- Left Column: Dynamic Method Configuration -->
+      <div class="controls-col">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title" id="active-method-title">Method 1: Image Enhancement</div>
+              <div class="card-subtitle">Choose sub-algorithm and adjust mathematical parameters</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <!-- Sub-Algorithm Dropdown -->
+            <div class="form-group">
+              <label class="form-label" for="sub-algo-select">Select Sub-Algorithm:</label>
+              <select class="form-select" id="sub-algo-select"></select>
+            </div>
+
+            <!-- Algorithm Explanation & Math -->
+            <div id="sub-algo-math-box" class="edu-box" style="margin-bottom: 1rem; padding: 0.75rem;">
+              <div class="edu-box-text" id="sub-algo-math-desc"></div>
+            </div>
+
+            <!-- Dynamic Parameter Form Fields -->
+            <div id="dynamic-params-container"></div>
+
+            <button class="btn btn-primary" id="btn-apply-method" style="width: 100%; margin-top: 1rem;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              Execute in GNU Octave (.m)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Before & After Previews -->
+      <div class="previews-col">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Before & After Verification Preview</div>
+              <div class="card-subtitle" id="execution-meta-text">Ready for algorithm execution</div>
+            </div>
+            <div style="display:flex; gap:0.5rem;">
+              <button class="btn btn-outline-sm" id="btn-save-as-input" disabled title="Use this result as input for another operation">
+                Reuse as Input
+              </button>
+              <button class="btn btn-primary btn-outline-sm" id="btn-download-result" disabled>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Download Result
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="preview-grid-2">
+              <!-- Before Pane -->
+              <div class="preview-pane">
+                <div class="preview-pane-header">
+                  <span class="preview-pane-title">
+                    <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#2563eb;"></span>
+                    Input (Before)
+                  </span>
+                </div>
+                <div class="preview-canvas-wrap">
+                  <img id="before-img" alt="Input Preview">
+                </div>
+              </div>
+
+              <!-- After Pane -->
+              <div class="preview-pane">
+                <div class="preview-pane-header">
+                  <span class="preview-pane-title">
+                    <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#059669;"></span>
+                    Octave Output (After)
+                  </span>
+                </div>
+                <div class="preview-canvas-wrap">
+                  <div class="preview-empty" id="after-empty">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                    </svg>
+                    <span>Click "Execute in GNU Octave" to produce result</span>
+                  </div>
+                  <img id="after-img" style="display:none;" alt="Octave Output Preview">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Saved Results History Gallery -->
+    <div class="gallery-section">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Page 3 Saved Outputs Repository</div>
+            <div class="card-subtitle" id="p3-gallery-subtitle">All intermediate enhancement, segmentation, edge, and morphology outputs</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="gallery-grid" id="p3-results-gallery">
+            <div class="preview-empty" style="grid-column: 1 / -1; padding: 2rem;">
+              <span>No outputs saved yet on Page 3.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loading-modal">
+      <div class="spinner"></div>
+      <div class="loading-title" id="loading-title">Executing GNU Octave...</div>
+      <div class="loading-desc" id="loading-desc">Calling algorithm .m file</div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <p>Saree Motif Segmentation Using Image Processing &bull; GNU Octave Academic Engine &bull; Light Theme Edition</p>
+  </footer>
+
+  <script src="js/session.js"></script>
+  <script src="js/page3.js"></script>
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saree Motif Segmentation Studio - GNU Octave</title>
+  <meta name="description" content="Interactive ROI bounding box selection, multi-method segmentation, morphological mask refinement, and genuine transparent PNG extraction in GNU Octave.">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header>
+    <nav class="navbar">
+      <a href="../index.html" class="nav-brand">
+        <div class="brand-icon">
+          <i class="fa-solid fa-gem"></i>
+        </div>
+        <div>
+          <div class="brand-title">Saree Motif Segmentation</div>
+          <div class="brand-subtitle">GNU Octave Image Processing Engine</div>
+        </div>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="../index.html" class="nav-link"><i class="fa-solid fa-sliders"></i> Basic Algorithms</a></li>
+        <li><a href="segmentation.html" class="nav-link active"><i class="fa-solid fa-crop-simple"></i> Motif Segmentation</a></li>
+        <li><a href="composition.html" class="nav-link"><i class="fa-solid fa-shirt"></i> Garment Composition</a></li>
+      </ul>
+
+      <div class="engine-status-badge" id="engineHealthBadge">
+        <span class="status-dot"></span> Checking Octave...
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-content">
+
+    <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="font-size: 1.8rem; margin-bottom: 0.25rem;">Interactive Saree Motif Segmentation</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+          Drag a bounding box around any peacock, paisley, or floral motif, configure Octave segmentation, and extract a genuine transparent PNG.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem;">
+        <button id="downloadTransparentBtn" class="btn btn-secondary btn-sm" disabled>
+          <i class="fa-solid fa-download"></i> Download Transparent PNG
+        </button>
+        <button id="sendToCompositionBtn" class="btn btn-primary btn-sm" disabled>
+          <i class="fa-solid fa-arrow-right"></i> Place on Garment
+        </button>
+      </div>
+    </div>
+
+    <!-- Three-Panel Layout Grid -->
+    <div class="studio-grid-three">
+
+      <!-- Column 1: Controls Panel -->
+      <div class="card" style="max-height: 820px; overflow-y: auto;">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fa-solid fa-gear"></i> Segmentation Controls</h2>
+          <span class="card-subtitle">Stage 1 & 2</span>
+        </div>
+
+        <!-- Sample Saree Chips -->
+        <div class="form-group">
+          <label class="form-label">Select Saree Image:</label>
+          <div class="sample-bar" id="segSampleChips"></div>
+          <button class="btn btn-outline btn-sm btn-block" onclick="document.getElementById('segFileInput').click()">
+            <i class="fa-solid fa-upload"></i> Upload Custom Saree
+          </button>
+          <input type="file" id="segFileInput" accept="image/*" style="display:none">
+        </div>
+
+        <!-- Interactive ROI Coordinates -->
+        <div class="form-group" style="background: rgba(18, 23, 34, 0.6); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span style="font-size: 0.85rem; font-weight: 600; color: #ffffff;">Bounding Box (ROI):</span>
+            <button id="selectAllRoiBtn" class="btn btn-outline btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">
+              Full Image
+            </button>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+            <div>
+              <label style="font-size: 0.75rem; color: var(--text-dim);">X (Left):</label>
+              <input type="number" id="roi_x" class="form-input" style="padding: 0.35rem;" value="1" readonly>
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; color: var(--text-dim);">Y (Top):</label>
+              <input type="number" id="roi_y" class="form-input" style="padding: 0.35rem;" value="1" readonly>
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; color: var(--text-dim);">Width:</label>
+              <input type="number" id="roi_w" class="form-input" style="padding: 0.35rem;" value="500" readonly>
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; color: var(--text-dim);">Height:</label>
+              <input type="number" id="roi_h" class="form-input" style="padding: 0.35rem;" value="500" readonly>
+            </div>
+          </div>
+        </div>
+
+        <!-- Segmentation Algorithm -->
+        <div class="form-group">
+          <label class="form-label" for="segMethodSelect">Segmentation Method:</label>
+          <select class="form-select" id="segMethodSelect">
+            <option value="otsu" selected>Otsu Global Binarization</option>
+            <option value="adaptive">Local Adaptive Windowing</option>
+            <option value="color">Color Distance (Gold Zari / Silk)</option>
+            <option value="edge">Canny Edge + Morphological Enclosing</option>
+          </select>
+        </div>
+
+        <!-- Color Segmentation Parameters (conditional) -->
+        <div id="colorSegmentationParams" style="display: none; background: rgba(212, 175, 55, 0.05); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid rgba(212, 175, 55, 0.2); margin-bottom: 1rem;">
+          <div class="form-group">
+            <label class="form-label">Target Motif Color:</label>
+            <input type="color" id="segTargetColorPicker" value="#d4af37" style="width: 100%; height: 36px; border: none; border-radius: var(--radius-sm); cursor: pointer;">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Color Tolerance: <span class="form-val-badge" id="colorTolVal">50</span></label>
+            <input type="range" class="form-range" id="segColorTolerance" min="10" max="120" value="50"
+              oninput="document.getElementById('colorTolVal').innerText = this.value">
+          </div>
+        </div>
+
+        <!-- Common Segmentation Flags -->
+        <div class="form-group">
+          <label class="form-checkbox-label" style="margin-bottom: 0.5rem;">
+            <input type="checkbox" class="form-checkbox" id="segInvertCheckbox">
+            <span>Invert Foreground (Light background)</span>
+          </label>
+          <label class="form-checkbox-label">
+            <input type="checkbox" class="form-checkbox" id="segKeepDominantCheckbox">
+            <span>Keep Dominant Connected Component Only</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Min Pixel Area Filter: <span class="form-val-badge" id="minAreaVal">30 px</span></label>
+          <input type="range" class="form-range" id="segMinArea" min="5" max="200" value="30"
+            oninput="document.getElementById('minAreaVal').innerText = this.value + ' px'">
+        </div>
+
+        <!-- Step 1 Trigger -->
+        <button id="generateMaskBtn" class="btn btn-primary btn-block" style="margin-bottom: 1.25rem;">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Mask in Octave
+        </button>
+
+        <!-- Step 2: Mask Refinement Section -->
+        <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: 1rem;">
+          <h3 style="font-size: 0.95rem; margin-bottom: 0.75rem; color: var(--secondary);"><i class="fa-solid fa-screwdriver-wrench"></i> Mask Refinement</h3>
+          
+          <div style="display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.75rem;">
+            <label class="form-checkbox-label">
+              <input type="checkbox" class="form-checkbox" id="opFillHoles" checked>
+              <span>Fill Interior Holes (imfill)</span>
+            </label>
+            <label class="form-checkbox-label">
+              <input type="checkbox" class="form-checkbox" id="opRemoveNoise" checked>
+              <span>Remove Specks (bwareaopen)</span>
+            </label>
+            <label class="form-checkbox-label">
+              <input type="checkbox" class="form-checkbox" id="opSmooth" checked>
+              <span>Morphological Smooth (Open + Close)</span>
+            </label>
+            <label class="form-checkbox-label">
+              <input type="checkbox" class="form-checkbox" id="opDilate">
+              <span>Boundary Dilation (+1 px)</span>
+            </label>
+            <label class="form-checkbox-label">
+              <input type="checkbox" class="form-checkbox" id="opErode">
+              <span>Boundary Erosion (-1 px)</span>
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Structuring Element Size: <span class="form-val-badge" id="refineSeVal">2 px</span></label>
+            <input type="range" class="form-range" id="refineSeSize" min="1" max="6" value="2"
+              oninput="document.getElementById('refineSeVal').innerText = this.value + ' px'">
+          </div>
+
+          <button id="refineMaskBtn" class="btn btn-outline btn-block" disabled>
+            <i class="fa-solid fa-broom"></i> Refine Mask in Octave
+          </button>
+        </div>
+
+        <!-- Step 3: Transparent Motif Extraction Section -->
+        <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: 1.25rem;">
+          <h3 style="font-size: 0.95rem; margin-bottom: 0.75rem; color: #ffffff;"><i class="fa-solid fa-image"></i> Genuine PNG Alpha Export</h3>
+
+          <div class="form-group">
+            <label class="form-label">Bounding Box Padding: <span class="form-val-badge" id="paddingVal">5 px</span></label>
+            <input type="range" class="form-range" id="extractPadding" min="0" max="25" value="5"
+              oninput="document.getElementById('paddingVal').innerText = this.value + ' px'">
+          </div>
+
+          <button id="extractMotifBtn" class="btn btn-secondary btn-block" disabled>
+            <i class="fa-solid fa-layer-group"></i> Extract Transparent Motif
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Column 2: Interactive ROI Canvas -->
+      <div class="view-panel">
+        <div class="view-label">
+          <span><i class="fa-solid fa-hand-pointer"></i> Click & Drag ROI Selection</span>
+          <span style="font-size:0.75rem;color:var(--text-dim)" id="segImageStats">Loading...</span>
+        </div>
+        <div class="preview-container" style="background:#0a0d14;">
+          <canvas id="roiCanvas" class="canvas-interactive"></canvas>
+        </div>
+        <div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-dim); text-align: center;">
+          <i class="fa-solid fa-info-circle"></i> Click and drag with mouse over any motif to draw a bounding box.
+        </div>
+      </div>
+
+      <!-- Column 3: Mask & Transparent PNG Previews -->
+      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        
+        <!-- Mask Preview -->
+        <div class="view-panel">
+          <div class="view-label">
+            <span><i class="fa-solid fa-mask"></i> Octave Binary Mask</span>
+            <span style="font-size:0.75rem;color:var(--secondary-light)">uint8 [0, 255]</span>
+          </div>
+          <div class="preview-container" style="min-height: 240px; max-height: 280px;">
+            <img id="maskPreviewImg" class="preview-img" style="display:none;" alt="Segmentation Mask">
+            <div id="maskEmptyState" class="preview-empty-state">
+              <i class="fa-solid fa-circle-half-stroke"></i>
+              <p>Mask will appear here</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transparent PNG Preview -->
+        <div class="view-panel">
+          <div class="view-label">
+            <span><i class="fa-solid fa-cubes"></i> Extracted Transparent Motif</span>
+            <span style="font-size:0.75rem;color:var(--success)">Genuine 32-bit Alpha</span>
+          </div>
+          <div class="preview-container checkerboard-bg" style="min-height: 240px; max-height: 280px;">
+            <img id="motifPreviewImg" class="preview-img" style="display:none;" alt="Transparent Extracted Motif">
+            <div id="motifEmptyState" class="preview-empty-state">
+              <i class="fa-solid fa-shapes"></i>
+              <p>Extracted PNG with alpha transparency will render here</p>
+            </div>
+            <div class="stats-badge-overlay" id="motifStatsBadge" style="display:none"></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>
+      Saree Motif Segmentation Using Image Processing &bull; Academic Project Implementation &bull;
+      Powered by <strong>GNU Octave</strong> & <strong>Node.js Express</strong>
+    </p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="../js/app.js"></script>
+  <script src="../js/segmentation.js"></script>
+</body>
+</html>
